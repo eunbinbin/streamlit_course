@@ -1,18 +1,21 @@
 import streamlit as st
 import datetime
-from todo import TodoDB
+from todo_row_factory import *
 # pip install email-validator
 from email_validator import validate_email, EmailNotValidError
 import re
+import pandas as pd
 
 # DB 객체 생성, 연결
 db = TodoDB()
 db.connectToDatabase()
 
+st.set_page_config(layout="wide")
+
 # 사이드 바
 sb = st.sidebar
 
-menu = sb.selectbox('메뉴', ['회원가입', '할일', '통계'], index=1)
+menu = sb.selectbox('메뉴', ['회원가입', '할일', '통계', '검색'])
 
 if menu == '회원가입':
 
@@ -72,13 +75,12 @@ if menu == '회원가입':
 
         users = db.readUsers()
         for user in users:
-
-            title = user[1]+'('+ user[3] + ')'
+            title = user['user_name']+'('+user['user_id']+')'
             with st.expander(title):
-                st.write(f'{user[1]}({user[5]})')
-                st.write(f'{user[2]}')
-                st.write(f'{user[6]}')
-                st.write(f'{user[7][:19]}')
+                st.write(f"{user['user_name']}({user['user_email']})")
+                st.write(f"{user['user_gender']}")
+                st.write(f"{user['user_mobile']}")
+                st.write(f"{user['reg_date'][:19]}")
 
 
 elif menu == '할일':
@@ -158,3 +160,71 @@ elif menu == '할일':
             args=(todo[0], ),
             key='del' + str(todo[0])
             )
+
+elif menu == '통계':
+
+
+
+    st.subheader('통계')
+
+    users = db.readUsers()
+    todos = db.readTodos()
+
+    col1, col2 = st.columns([5,5])
+
+    df_users = pd.DataFrame(users, columns=['id','성명','성별','아이디','비밀번호','이메일','휴대전화','등록일시']).set_index('id')
+    df_todos = pd.DataFrame(todos, columns=['id','할일','날짜','시간','완료여부','등록일시']).set_index('id')
+
+    with col1:
+        st.markdown('#### 회원')
+        st.dataframe(df_users, use_container_width=True)
+
+        st.markdown('#### 회원 요약')
+        st.dataframe(df_users.describe(include='all').fillna("").astype('str'),use_container_width=True)
+
+        st.markdown('#### 성별 인원')
+        df_sex = df_users['성별'].value_counts()
+        st.dataframe(df_sex)
+
+        from collections import  Counter
+        df_sex2 = Counter(df_users['성별'])
+        st.dataframe(df_sex2)
+
+    with col2:
+        st.markdown('#### 할일')
+        st.dataframe(df_todos, use_container_width=True)
+
+        st.markdown('##### 할일 요약')
+        st.dataframe(df_todos.describe(include='all').fillna("").astype('str'),use_container_width=True)
+
+        st.markdown('##### 조건 검색')
+        df_date = df_todos.loc[df_todos['날짜'] >= '2023-04-10'][['할일','날짜','시간']]
+        st.dataframe(df_date, use_container_width=True)
+
+elif menu == '검색':
+
+    with st.sidebar:
+        # 회원검색
+        st.subheader('회원검색')
+        s_name = st.text_input('성명')
+        s_btn = st.button('회원검색')
+
+        # 할일검색
+        st.subheader('할일검색')
+        t_name = st.text_input('할일')
+        t_date = st.text_input('날짜')
+        t_btn = st.button('할일검색')
+
+    if s_btn:
+        res = db.findUserByName(s_name)
+        st.subheader('검색 결과')
+        st.dataframe(res)
+
+    if t_btn:
+        res = db.findTodos(t_name, t_date)
+        st.subheader('검색 결과')
+        st.dataframe(res)
+
+
+
+
