@@ -125,40 +125,48 @@ elif menu == '할일':
 
     todos = db.readTodos()
     for todo in todos:
+        task = Task(
+            id=todo[0],
+            todo_content=todo[1],
+            todo_date=todo[2],
+            todo_time=todo[3],
+            completed=todo[4],
+            reg_date=todo[5]
+        )
         col1, col2, col3, col4, col5, col6 = st.columns([1,3,2,2,3,2])
         col1.checkbox(
-            str(todo[0]),
-            value=True if todo[4] else False,
+            str(task.id),
+            value=True if task.completed else False,
             on_change=change_state,
             label_visibility='collapsed',
-            args=(todo[0], False if todo[4] else True))
+            args=(task.id, False if task.completed else True))
         col2.text_input(
-            str(todo[0]),
-            value=todo[1],
+            str(task.id),
+            value=task.todo_content,
             on_change=change_content,
             label_visibility='collapsed',
-            args=(todo[0], 'content'+str(todo[0])),
-            key='content'+str(todo[0]))
+            args=(task.id, 'content'+str(task.id)),
+            key='content'+str(task.id))
         col3.date_input(
-            str(todo[0]),
-            value=datetime.datetime.strptime(todo[2], '%Y-%m-%d').date(),
+            str(task.id),
+            value=datetime.datetime.strptime(task.todo_date, '%Y-%m-%d').date(),
             on_change=change_date,
             label_visibility='collapsed',
-            args=(todo[0], 'date'+str(todo[0])),
-            key='date'+str(todo[0]))
+            args=(task.id, 'date'+str(task.id)),
+            key='date'+str(task.id))
         col4.time_input(
-            str(todo[0]),
-            value=datetime.datetime.strptime(todo[3], '%H:%M').time(),
+            str(task.id),
+            value=datetime.datetime.strptime(task.todo_time, '%H:%M').time(),
             on_change=change_time,
             label_visibility='collapsed',
-            args=(todo[0], 'time'+str(todo[0])),
-            key='time'+str(todo[0]))
-        col5.text(todo[5][0:19])
+            args=(task.id, 'time'+str(task.id)),
+            key='time'+str(task.id))
+        col5.text(task.reg_date[0:19])
         col6.button(
             '삭제',
             on_click=delete_todo,
-            args=(todo[0], ),
-            key='del' + str(todo[0])
+            args=(task.id, ),
+            key='del' + str(task.id)
             )
 
 elif menu == '통계':
@@ -179,14 +187,14 @@ elif menu == '통계':
         st.markdown('#### 회원')
         st.dataframe(df_users, use_container_width=True)
 
-        st.markdown('#### 회원 요약')
+        st.markdown('##### 회원 요약')
         st.dataframe(df_users.describe(include='all').fillna("").astype('str'),use_container_width=True)
 
-        st.markdown('#### 성별 인원')
+        st.markdown('##### 성별 인원')
         df_sex = df_users['성별'].value_counts()
         st.dataframe(df_sex)
 
-        from collections import  Counter
+        from collections import Counter
         df_sex2 = Counter(df_users['성별'])
         st.dataframe(df_sex2)
 
@@ -224,6 +232,8 @@ elif menu == '검색':
         res = db.findTodos(t_name, t_date)
         st.subheader('검색 결과')
         st.dataframe(res)
+
+
 
 
 

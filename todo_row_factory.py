@@ -1,4 +1,27 @@
 import sqlite3
+from dataclasses import dataclass
+
+
+@dataclass
+class Task:
+    id: int
+    todo_content: str
+    todo_date: str
+    todo_time: str
+    completed: int
+    reg_date: str
+
+
+@dataclass
+class User:
+    id: int
+    user_name: str
+    user_gender: str
+    user_id: str
+    user_pw: str
+    user_email: str
+    user_mobile: str
+    reg_date: str
 
 
 class TodoDB:
@@ -9,6 +32,7 @@ class TodoDB:
     def connectToDatabase():
         try:
             TodoDB.con = sqlite3.connect('todo.db', check_same_thread=False)
+            TodoDB.con.row_factory = sqlite3.Row
             c = TodoDB.con.cursor()
             c.execute(f'CREATE TABLE IF NOT EXISTS tasks '
                       f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
