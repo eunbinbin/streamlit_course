@@ -48,7 +48,7 @@ def main():
 
     if st.checkbox("Select Columns To Show"):
         all_columns = df.columns.tolist()
-        selected_columns = stm.multiselect('Select',all_columns)
+        selected_columns = st.multiselect('Select',all_columns)
         new_df = df[selected_columns]
         st.dataframe(new_df)
 
@@ -95,7 +95,7 @@ def main():
         st.info("Please Choose the X and Y Column")
         x_column = st.selectbox('Select X columns For Barh Plot',all_columns_names)
         y_column = st.selectbox('Select Y Columns For Varh Plot',all_columns_names)
-        barh_plot = df.plot.barh(x=x-column,y=y_column,figsize=(10,10))
+        barh_plot = df.plot.barh(x=x_column,y=y_column,figsize=(10,10))
         if st. button("Generate Barh Plot"):
             st.write(barh_plot)
             st.pyplot()
@@ -123,7 +123,7 @@ def main():
             st.write(custom_plot)
             st.pyplot()
         elif type_of_plot == 'box':
-            custom_plot == df[selected_columns_names].plot(kind=type_of_plot)
+            custom_plot = df[selected_columns_names].plot(kind=type_of_plot)
             st.write(custom_plot)
             st.pyplot()
         elif type_of_plot == 'kde':
@@ -151,3 +151,20 @@ def main():
 
         st.markdown("""[google.com](iris.zip""")
         st.markdown("""[google.com](./iris.zip)""")
+
+        def makezipfile(data):
+            output_filename = '{}_zipped.zip'.format(data)
+            with ZipFile(output_filename,"W")as z:
+                z.write(data)
+            return output_filename
+        if st.button("Download File"):
+            DOWNLOAD_TPL = f'[{filename}]({makezipfile(filename)})'
+
+            st.text(DOWNLOAD_TPL)
+            st.markdown(DOWNLOAD_TPL)
+
+
+
+
+if __name__ == '__main__':
+    main()
