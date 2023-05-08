@@ -3,9 +3,9 @@ import streamlit as st
 from streamlit_chat import message
 
 from langchain.chains import ConversationChain
-from langchain.chains.conversation.memory imoport ConversationEntityMemory
+from langchain.chains.conversation.memory import ConversationEntityMemory
 from langchain.chains.conversation.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE
-from langchainin.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI
 
 api_key = 'your-key'
 
@@ -30,7 +30,7 @@ def generate_response(prompt):
 
     # Create the ConversationChain object with the specified configuration
     Conversation = ConversationChain(
-        11m=11m,
+        llm=llm,
         prompt=ENTITY_MEMORY_CONVERSATION_TEMPLATE,
         memory=st.session_state.entity_memory
     )
@@ -40,7 +40,7 @@ def generate_response(prompt):
     return output
 
 
-11m = ChatOpenAI(
+llm = ChatOpenAI(
     temperature=0,
     openai_api_key=api_key,
     model_name='gpt-3.5-turbo',
@@ -49,7 +49,7 @@ def generate_response(prompt):
 
 # Create a ConversationEntityMemory object if not already created
 if 'entity_memory' not in st.session_state:
-    st.session_state.entity_memory = ConversationEntityMemory(11m=11m, k=200)
+    st.session_state.entity_memory = ConversationEntityMemory(llm=llm, k=200)
 
 st.title("  chatBot based by GPT-3.5-turbo")
 
