@@ -8,7 +8,7 @@ import requests, io
 def generate():
     openai.api_key = "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"
     user_prompt = st.session_state['prompt']
-    user_prompt =+ "in style: " + st.session_state['img_style']
+    user_prompt += "in style: " + st.session_state['img_style']
 
     response = openai.Image.create(
         prompt=user_prompt,
